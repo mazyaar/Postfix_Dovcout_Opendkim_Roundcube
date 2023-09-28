@@ -748,12 +748,16 @@ sudo systemctl start opendkim
 sudo systemctl enable opendkim
 ```
 
-## 4.3 Generate DKIM key:
+## 4.3 Generate DKIM Public key:
 ```bash
 mkdir /etc/opendkim
 ```
 ```bash
 opendkim-genkey -D /etc/opendkim/ --domain domain.com --selector mail 
+```
+_or_
+```bash
+sudo opendkim-genkey -s mail -d example.com
 ```
 ```bash
 cat /etc/opendkim/mail.txt
@@ -784,9 +788,8 @@ SyslogSuccess Yes
 LogWhy Yes
 Mode sv
 Canonicalization relaxed/simple
-Canonicalization relaxed/simple
 UserID opendkim:opendkim
-Socket inet:8891@localhost
+Socket inet:12301@localhost
 PidFile /var/run/opendkim/opendkim.pid
 ExternalIgnoreList refile:/etc/opendkim/TrustedHosts
 InternalHosts refile:/etc/opendkim/TrustedHosts
@@ -801,17 +804,33 @@ SignatureAlgorithm rsa-sha256
 sudo nano /etc/opendkim/TrustedHosts
 ```
 ```bash
+127.0.0.1
+localhost
+192.168.1.1/24
 domain.com
+*.domain.com
 ```
 
-***Give the path to the key.***
+***Give the path to the Private key Table.***
 ```bash
 sudo nano /etc/opendkim/KeyTable
 ```
 ```bash
 mail._domainkey.domain.com domain.com:mail:/etc/opendkim/dkim.private
 ```
-***The path to the signature.***
+```bash
+sudo mkdir example.com
+```
+```bash
+cd example.com
+```
+```bash
+sudo opendkim-genkey -s mail -d example.com
+```
+```bash
+sudo chown opendkim:opendkim mail.private
+```
+***The path to the signature Table.***
 ```bash
 sudo nano /etc/opendkim/SigningTable
 ```
@@ -832,6 +851,22 @@ _https://www.wormly.com/tools_
 _https://easydmarc.com/tools/dkim-record-generator_
 _https://dmarcian.com/dkim-inspector/_
 _https://powerdmarc.com/dkim-record-generator/_
+
+## 4.7 Add Postfix DKIM Configuration:
+```bash
+sudo nano /etc/postfix/main.cf
+```
+```bash
+milter_protocol = 2
+milter_default_action = accept
+smtpd_milters = inet:localhost:12301
+non_smtpd_milters = inet:localhost:12301
+```
+_optional_
+```
+smtpd_milters = unix:/spamass/spamass.sock, inet:localhost:12301
+non_smtpd_milters = unix:/spamass/spamass.sock, inet:localhost:12301
+```
 
 
 # 5. Rouncube 
