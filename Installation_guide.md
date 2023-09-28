@@ -813,12 +813,6 @@ domain.com
 
 ***Give the path to the Private key Table.***
 ```bash
-sudo nano /etc/opendkim/KeyTable
-```
-```bash
-mail._domainkey.domain.com domain.com:mail:/etc/opendkim/dkim.private
-```
-```bash
 sudo mkdir example.com
 ```
 ```bash
@@ -829,6 +823,12 @@ sudo opendkim-genkey -s mail -d example.com
 ```
 ```bash
 sudo chown opendkim:opendkim mail.private
+```
+```bash
+sudo nano /etc/opendkim/KeyTable
+```
+```bash
+mail._domainkey.domain.com domain.com:mail:/etc/opendkim/example.com/mail.private
 ```
 ***The path to the signature Table.***
 ```bash
