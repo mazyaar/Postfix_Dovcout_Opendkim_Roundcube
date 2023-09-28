@@ -350,6 +350,8 @@ smtp_tls_security_level = may
 smtp_tls_received_header = yes
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 smtpd_use_tls = yes
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+smtputf8_enable = no
 ```
 
 ## 2.8 master.cf configurations: 
@@ -489,7 +491,6 @@ mailman   unix  -       n       n       -       -       pipe
   flags=FRX user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py ${nexthop} ${user}
 ```
 
-
 ## 2.9 restart and check configurations:
 ```bash
 sudo systemctl restart postfix.service
@@ -516,10 +517,14 @@ postfix reload
 sudo apt-get install dovecot-imapd dovecot-pop3d
 ```
 ```bash
-sudo apt install dovecot-sudo apt install dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql
+sudo apt install dovecot-sudo apt install dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved
 ```
 ```bash
 apt-get install libsasl2-modules
+```
+* Add ``lmtp`` and ``sieve`` and ``imap`` and ``pop3``  to the supported protocols.
+```bash
+protocols = imap pop3 lmtp sieve
 ```
 
 ## 3.2 Dovecot SSL configuration
@@ -558,7 +563,7 @@ mail_location = maildir:~/Maildir
 #(same as home on Postfix main.cf file)
 ```
 
-## 3.5 Configure master files to enable protocols:
+## 3.5 Configure master, lda, lmtp files to enable protocols:
 - Update this configurations same as this:
 ```bash
 nano /etc/dovecot/conf.d/10-master.conf 
@@ -592,20 +597,38 @@ service submission-login {
 }
 
 service lmtp {
-  unix_listener lmtp {
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {
+    group = postfix
     mode = 0666
+    user = postfix
   }
 ```
-
-
+* Open the /etc/dovecot/conf.d/15-lda.conf file.
+```bash
+nano /etc/dovecot/conf.d/15-lda.conf 
+```
+* add this config:
+```bash
+protocol lda {
+    # Space separated list of plugins to load (default is global mail_plugins).
+    mail_plugins = $mail_plugins sieve
+}
+```
+* Open the /etc/dovecot/conf.d/20-lmtp.conf file.
+```bash
+nano /etc/dovecot/conf.d/20-lmtp.conf 
+```
+* add this config:
+```bash
+protocol lmtp {
+      mail_plugins = quota sieve
+}
+```
 ## 3.5 Service restart:
 ```bash
-sudo systemctl restart dovecot.service
+sudo systemctl restart postfix dovecot
 ```
-
-
 ## 3.6  Test your Conetion Ports
-
 >Test your setup
 SMTP-AUTH configuration is complete – now it is time to test the setup. To see if SMTP-AUTH and TLS work properly, run the following command:
 ```bash
@@ -909,3 +932,30 @@ certbot --apache
 
 **Continue**
 ![](https://www.nginxweb.ir/blog/images/2019/05/15568928619111.png)
+
+## 5.10 Removing Sensitive Information from Email Headers
+> _By default, Roundcube will add a User-Agent email header, indicating that you are using Roundcube webmail and the version number. You can tell Postfix to ignore it so recipient can not see it. Run the following command to create a header check file_
+```bash
+sudo nano /etc/postfix/smtp_header_checks
+```
+**Put the following lines into the file.**
+```
+/^User-Agent.*Roundcube Webmail/            IGNORE
+```
+```bash
+sudo nano /etc/postfix/main.cf
+```
+**Add the following line at the end of the file.**
+```bash
+smtp_header_checks = regexp:/etc/postfix/smtp_header_checks
+```
+_Save and close the file. Then run the following command to rebuild hash table._
+```bash
+sudo postmap /etc/postfix/smtp_header_checks
+```
+***Reload Postfix for the change to take effect.***
+```bash
+sudo systemctl reload postfix
+```
+
+
