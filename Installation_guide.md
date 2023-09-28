@@ -987,3 +987,38 @@ sudo postmap /etc/postfix/smtp_header_checks
 ```bash
 sudo systemctl reload postfix
 ```
+## 5.11 Increase Upload File Size Limit
+> _If you use PHP-FPM to run PHP scripts, then files such as images, PDF files uploaded to Roundcube can not be larger than 2MB. To increase the upload size limit, edit the PHP configuration file._
+```bash
+sudo nano /etc/php/7.2/apache2/php.ini
+```
+```
+upload_max_filesize = 50M
+post_max_size = 50M
+```
+***Alternatively, you can run the following two commands to change the value without manually opening the file.***
+```bash
+sudo sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 50M/g' /etc/php/7.2/fpm/php.ini
+sudo sed -i 's/post_max_size = 8M/post_max_size = 50M/g' /etc/php/7.2/fpm/php.ini
+```
+```bash
+systemctl restart apache2
+```
+* There are 3 plugins in Roundcube for attachments/file upload:
+
+* database_attachments
+* filesystem_attachments
+* redundant_attachments
+_Roundcube can use only one plugin for attachments/file uploads. I found that the database_attachment plugin can be error_prone and cause you trouble. To disable it, edit the Roundcube config file._
+```bash
+sudo nano /var/www/roundcube/config/config.inc.php
+```
+_Scroll down to the end of this file. You will see a list of active plugins. Remove 'database_attachments' from the list. Note that you need to activate at least one other attachment plugin, for example, filesystem_attachments._
+```bash
+// ----------------------------------
+// PLUGINS
+// ----------------------------------
+// List of active plugins (in plugins/ directory)
+$config['plugins'] = ['acl', 'additional_message_headers', 'archive', 'attachment_reminder', 'autologon', 'debug_logger', 'emoticons', 'enigma', 'filesystem_attachments', 'help', 'hide_blockquote', 'http_authentication', 'identicon', 'identity_select', 'jqueryui', 'krb_authentication', 'managesieve', 'markasjunk', 'new_user_dialog', 'new_user_identity', 'newmail_notifier', 'password', 'reconnect', 'redundant_attachments', 'show_additional_headers', 'squirrelmail_usercopy', 'subscriptions_option', 'userinfo', 'vcard_attachments', 'virtuser_file', 'virtuser_query', 'zipdownload'];
+```
+***Save and close the file.***
