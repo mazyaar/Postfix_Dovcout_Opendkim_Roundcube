@@ -317,7 +317,7 @@ smtpd_tls_security_level=may
 smtp_tls_CApath=/etc/cyberredcert/cert.crt #(it's better that use .crt and .key files)
 smtp_tls_security_level=may
 smtpd_tls_auth_only = yes
-smtpd_tls_loglevel = 2
+smtpd_tls_loglevel = 1
 tls_random_source = dev:/dev/urandom
 smtpd_tls_received_header = yes
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
@@ -352,6 +352,11 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 smtpd_use_tls = yes
 mailbox_transport = lmtp:unix:private/dovecot-lmtp
 smtputf8_enable = no
+#Enforce TLSv1.3 or TLSv1.2
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtp_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtp_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 ```
 
 ## 2.8 master.cf configurations: 
@@ -378,30 +383,35 @@ smtp      inet  n       -       y       -       -       smtpd
 #tlsproxy  unix  -       -       y       -       0       tlsproxy
 # Choose one: enable submission for loopback clients only, or for any client.
 #127.0.0.1:submission inet n -   y       -       -       smtpd
-#submission inet n       -       y       -       -       smtpd
-#  -o syslog_name=postfix/submission
-#  -o smtpd_tls_security_level=encrypt
-#  -o smtpd_sasl_auth_enable=yes
+submission inet n       -       y       -       -       smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_tls_wrappermode=no
+  -o smtpd_sasl_auth_enable=yes
 #  -o smtpd_tls_auth_only=yes
 #  -o smtpd_reject_unlisted_recipient=no
 #  -o smtpd_client_restrictions=$mua_client_restrictions
 #  -o smtpd_helo_restrictions=$mua_helo_restrictions
 #  -o smtpd_sender_restrictions=$mua_sender_restrictions
-#  -o smtpd_recipient_restrictions=
-#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
 #  -o milter_macro_daemon_name=ORIGINATING
 # Choose one: enable smtps for loopback clients only, or for any client.
 #127.0.0.1:smtps inet n  -       y       -       -       smtpd
 #smtps     inet  n       -       y       -       -       smtpd
-#  -o syslog_name=postfix/smtps
-#  -o smtpd_tls_wrappermode=yes
-#  -o smtpd_sasl_auth_enable=yes
+  -o syslog_name=postfix/smtps
+  -o smtpd_tls_wrappermode=yes
+  -o smtpd_sasl_auth_enable=yes
 #  -o smtpd_reject_unlisted_recipient=no
 #  -o smtpd_client_restrictions=$mua_client_restrictions
 #  -o smtpd_helo_restrictions=$mua_helo_restrictions
 #  -o smtpd_sender_restrictions=$mua_sender_restrictions
-#  -o smtpd_recipient_restrictions=
-#  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_recipient_restrictions=permit_mynetworks,permit_sasl_authenticated,reject
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_sasl_type=dovecot
+  -o smtpd_sasl_path=private/auth
 #  -o milter_macro_daemon_name=ORIGINATING
 #628       inet  n       -       y       -       -       qmqpd
 pickup    unix  n       -       y       60      1       pickup
@@ -501,7 +511,12 @@ postfix check
 ```bash
 postfix -n
 ````
-
+```bash
+sudo systemctl restart postfix
+````
+```bash
+sudo ss -lnpt | grep master
+````
 ***To disable backwards compatibility use:***
 ```bash
 postconf compatibility_level=3.6
@@ -535,11 +550,14 @@ protocols = imap pop3 lmtp sieve
 nano /etc/dovecot/conf.d/10-ssl.conf
 ```
 ```bash
-ssl = yes
+ssl = yes #or set to: required
 ssl_cert = </etc/cyberredcert/cert.crt #(it's better that use .crt and .key files)
 ssl_key = </etc/cyberredcert/private.key #(it's better that use .crt and .key files)
 ssl_client_ca_dir = /etc/ssl/certs
 ssl_dh = </usr/share/dovecot/dh.pem
+ssl_prefer_server_ciphers = yes
+ssl_min_protocol = TLSv1.2
+
 ```
 
 ## 3.3 permit use of SMTP-AUTH by Outlook clients,
@@ -548,7 +566,8 @@ ssl_dh = </usr/share/dovecot/dh.pem
 nano /etc/dovecot/conf.d/10-auth.conf
 ```
 ```bash
-disable_plaintext_auth = no
+disable_plaintext_auth = yes
+auth_username_format = %n
 auth_mechanisms = plain login
 !include auth-system.conf.ext
 ```
@@ -565,6 +584,7 @@ mail_location = maildir:~/Maildir
 
 ## 3.5 Configure master, lda, lmtp files to enable protocols:
 - Update this configurations same as this:
+- Be careful about the syntax. Each opening bracket needs to be paired with a closing bracket.
 ```bash
 nano /etc/dovecot/conf.d/10-master.conf 
 ```
@@ -602,6 +622,13 @@ service lmtp {
     mode = 0666
     user = postfix
   }
+service auth {
+    unix_listener /var/spool/postfix/private/auth {
+      mode = 0660
+      user = postfix
+      group = postfix
+    }
+}
 ```
 * Open the /etc/dovecot/conf.d/15-lda.conf file.
 ```bash
@@ -627,6 +654,9 @@ protocol lmtp {
 ## 3.5 Service restart:
 ```bash
 sudo systemctl restart postfix dovecot
+```
+```bash
+sudo ss -lnpt | grep dovecot
 ```
 ## 3.6  Test your Conetion Ports
 >Test your setup
@@ -957,5 +987,3 @@ sudo postmap /etc/postfix/smtp_header_checks
 ```bash
 sudo systemctl reload postfix
 ```
-
-
