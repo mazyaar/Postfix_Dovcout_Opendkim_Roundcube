@@ -733,47 +733,7 @@ domain.com	IN	MX	1   mail.example.com.
 ```
 @		IN	TXT	"v=DMARC1; p=quarantine; rua=mailto:734eda41@mxtoolbox.dmarc-report.com; ruf=mailto:734eda41@forensics.dmarc-report.com; fo=1"
 ```
-
-# 4.2 Install DKIM and Configurations:
-
-## How to create TXT Record for mail server:
-
-```bash
-apt-get install opendkim opendkim-tools
-```
-```bash
-sudo systemctl start opendkim
-```
-```bash
-sudo systemctl enable opendkim
-```
-
-## 4.3 Generate DKIM Public key:
-```bash
-mkdir /etc/opendkim
-```
-```bash
-opendkim-genkey -D /etc/opendkim/ --domain domain.com --selector mail 
-```
-_or_
-```bash
-sudo opendkim-genkey -s mail -d example.com
-```
-```bash
-cat /etc/opendkim/mail.txt
-```
-```
-mail._domainkey IN      TXT     ( "v=DKIM1; h=sha256; k=rsa; "
-          "p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy8RgR99W2QpJTB7/fmuNrLgy9vtr04js+wkzHeVPaXoTo074gVHe/uUSspmAqgqTEmwoU0kLrYtBFKUlwKH22gNPNkLJInmUg/BOTYDy9LI5sJTpO/bLNCqhuvcOcYdIrwVAovn5gYSyq9j+WVSfT2zimkALmH4VZVEwH+z0hZ4bLbwJsVNmqWbAxhxd5mBa/x+ZGwspMGL9el"
-          "DFtfVWbTse9VkzI9UV3mOlaXCv4j5s/bja5PwwlGSqXB4DzVi4gg/PLFcRodDgT23bK3FK/Uol/9/dQrxTD8L4Ruf3TNnoGKJMbfcQzoPl4lxvjNXsv5b/CrZNbZYpwdF2rKCDPwIDAQAB" )  ; ----- DKIM key mail for domain.com
-```
-
-> ***Copy the contents, switch to DNS control panel and create a TXT record:***
-
-***mail._domainkey IN TXT ( "v=DKIM1; k=rsa; "***
-
-
-# 4.4 OpenDkim Configurations:
+# 4.2 OpenDkim Configurations:
 ```bash
 sudo chown -R opendkim:opendkim /etc/opendkim
 sudo nano /etc/opendkim.conf
@@ -798,61 +758,16 @@ SigningTable refile:/etc/opendkim/SigningTable
 SignatureAlgorithm rsa-sha256 
 ```
 
+# 4.3 Connect the milter to Postfix:
 
-# 4.5 Add your domain to trusted hosts.
 ```bash
-sudo nano /etc/opendkim/TrustedHosts
+sudo nano /etc/default/opendkim
 ```
-```bash
-127.0.0.1
-localhost
-192.168.1.1/24
-domain.com
-*.domain.com
+_Add the following line, edit the port number only if a custom one is used_
 ```
-
-***Give the path to the Private key Table.***
-```bash
-sudo mkdir example.com
+SOCKET="inet:12301@localhost"
 ```
-```bash
-cd example.com
-```
-```bash
-sudo opendkim-genkey -s mail -d example.com
-```
-```bash
-sudo chown opendkim:opendkim mail.private
-```
-```bash
-sudo nano /etc/opendkim/KeyTable
-```
-```bash
-mail._domainkey.domain.com domain.com:mail:/etc/opendkim/example.com/mail.private
-```
-***The path to the signature Table.***
-```bash
-sudo nano /etc/opendkim/SigningTable
-```
-```bash
-*@domain.com mail._domainkey.domain.com
-```
-
-## 4.6 Restart the services
-```bash
-sudo systemctl restart opendkim
-sudo systemctl restart postfix
-```
-
-## 4.6 Test Online Tools:
->_https://www.ssllabs.com/ssltest/_
-https://mxtoolbox.com/_
-_https://www.wormly.com/tools_
-_https://easydmarc.com/tools/dkim-record-generator_
-_https://dmarcian.com/dkim-inspector/_
-_https://powerdmarc.com/dkim-record-generator/_
-
-## 4.7 Add Postfix DKIM Configuration:
+# 4.4 Add Postfix DKIM Configuration:
 ```bash
 sudo nano /etc/postfix/main.cf
 ```
@@ -867,7 +782,98 @@ _optional_
 smtpd_milters = unix:/spamass/spamass.sock, inet:localhost:12301
 non_smtpd_milters = unix:/spamass/spamass.sock, inet:localhost:12301
 ```
+# 4.5 Create a directory structure
 
+```bash
+sudo mkdir /etc/opendkim
+sudo mkdir /etc/opendkim/keys
+```
+# 4.6 Add Trusted Hosts
+```bash
+sudo nano /etc/opendkim/TrustedHosts
+```
+```bash
+127.0.0.1
+localhost
+192.168.0.1/24
+
+*.example.com
+
+#*.example.net
+#*.example.org
+```
+# 4.7 Create Table
+
+```bash
+sudo nano /etc/opendkim/KeyTable
+```
+_Customize and add the following lines to the newly created file. Multiple domains can be specified, do not edit the first three lines:_
+```
+mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
+
+#mail._domainkey.example.net example.net:mail:/etc/opendkim/keys/example.net/mail.private
+#mail._domainkey.example.org example.org:mail:/etc/opendkim/keys/example.org/mail.private
+```
+
+# 4.8 Create a signing table:
+
+```bash
+sudo nano /etc/opendkim/SigningTable
+```
+_This file is used for declaring the domains/email addresses and their selectors._
+```
+*@example.com mail._domainkey.example.com
+
+#*@example.net mail._domainkey.example.net
+#*@example.org mail._domainkey.example.org
+```
+
+# 4.9 Generate the public and private keys
+_Change to the keys directory:_
+```bash
+cd /etc/opendkim/keys
+```
+_Create a separate folder for the domain to hold the keys:_
+```bash
+sudo mkdir example.com
+cd example.com
+```
+_Generate the keys_
+```bash
+sudo opendkim-genkey -s mail -d example.com
+```
+
+> -s specifies the selector and -d the domain, this command will create two files, mail.private is our private key and mail.txt contains the public key.
+
+_Change the owner of the private key to opendkim:_
+
+```bash
+sudo chown opendkim:opendkim mail.private
+```
+# 4.10 Add the public key to the domain’s DNS records
+_Open mail.txt:_
+```
+mail._domainkey IN TXT "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N3lnvvrYgPCRSoqn+awTpE+iGYcKBPpo8HHbcFfCIIV10Hwo4PhCoGZSaKVHOjDm4yefKXhQjM7iKzEPuBatE7O47hAx1CJpNuIdLxhILSbEmbMxJrJAG0HZVn8z6EAoOHZNaPHmK2h4UUrjOG8zA5BHfzJf7tGwI+K619fFUwIDAQAB" ; ----- DKIM key mail for example.com
+```
+* Copy that key and add a TXT record to your domain’s DNS entries:
+
+```
+Name: mail._domainkey.example.com.
+Text: "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N3lnvvrYgPCRSoqn+awTpE+iGYcKBPpo8HHbcFfCIIV10Hwo4PhCoGZSaKVHOjDm4yefKXhQjM7iKzEPuBatE7O47hAx1CJpNuIdLxhILSbEmbMxJrJAG0HZVn8z6EAoOHZNaPHmK2h4UUrjOG8zA5BHfzJf7tGwI+K619fFUwIDAQAB"
+```
+# 4.11 Restart Service:
+```bash
+sudo service postfix restart
+sudo service opendkim restart
+```
+> _The configuration can be tested by sending an empty email to ``check-auth@verifier.port25.com`` and a reply will be received. If everything works correctly you should see DKIM ``check: pass`` under Summary of Results._
+
+> _Alternatively, you can send a message to a Gmail address that you control, view the received email’s headers in your Gmail inbox, dkim=pass should be present in the Authentication-Results header field._
+```
+Authentication-Results: mx.google.com;
+       spf=pass (google.com: domain of contact@example.com designates --- as permitted sender) smtp.mail=contact@example.com;
+       dkim=pass header.i=@example.com;
+```
 
 # 5. Rouncube 
 
