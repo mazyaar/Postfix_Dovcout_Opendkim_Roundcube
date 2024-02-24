@@ -554,7 +554,7 @@ postfix reload
 sudo apt-get install dovecot-imapd dovecot-pop3d
 ```
 ```bash
-sudo apt install dovecot-sudo apt install dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved
+sudo apt install dovecot dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-mysql dovecot-sieve dovecot-managesieved
 ```
 ```bash
 apt-get install libsasl2-modules
