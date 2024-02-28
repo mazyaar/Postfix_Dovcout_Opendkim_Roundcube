@@ -92,7 +92,10 @@ InternalHosts refile:/etc/opendkim/TrustedHosts
 KeyFile /etc/opendkim/keys/domain/domain.private
 KeyTable refile:/etc/opendkim/KeyTable
 SigningTable refile:/etc/opendkim/SigningTable
-SignatureAlgorithm rsa-sha256 
+SignatureAlgorithm rsa-sha256
+Domain domain.com
+RequireSafeKeys False
+
 ```
 
 # 4.3 Connect the milter to Postfix:
