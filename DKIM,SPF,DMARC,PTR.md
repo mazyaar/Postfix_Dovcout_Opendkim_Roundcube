@@ -3,48 +3,66 @@
 
 # 4. DNS Record Introduce:
 
+![Before visit Bind9 DNS server configurations]([https://tecadmin.net/wp-content/uploads/2021/07/roundcube-step-1.png](https://github.com/mazyaar/Ubuntu_DNS_Server_Bind9))
+
+
 ## 4.1 Explain necessary mails records:
 
 > ***add TXT Record on bind9 server or Domain host and Configurations db on bind9:***
 ```bash
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     domain.com. root.domain.com. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+
 domain.com	IN	A	83.136.253.111
-domain.com	IN	MX	1   mail.example.com. 
-@		IN	MX	1   mail.example.com. 
-@		IN	MX	2   mail.example.com.
-@       	IN      TXT	v=spf1 ip4:83.136.253.111 include:_spf.google.com include: ~all
+domain.com	IN	MX	1   mail.domain.com. 
+@		IN	MX	1   mail.domain.com. 
+@		IN	MX	2   mail.domain.com.
+@       	IN      TXT	v=spf1 ip4:83.136.253.111 include:_spf.google.com include: -all
 @       	IN      TXT	v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB
-@		IN	TXT	"v=DMARC1; p=none; rua=mailto:734eda41@mxtoolbox.dmarc-report.com; ruf=mailto:734eda41@forensics.dmarc-report.com; fo=1"
+@		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
 
 ***DNS Record (A):*** 
 ```
 domain.com	IN	A	83.136.253.111
 ```
-PTR Record:
+***PTR Record:***
 ```
-193.252.76.in-addr.arpa. IN  SOA  ns1.swbell.net. rm-hostmaster.ems.att.com.
+83.136.253.in-addr.arpa. IN  SOA  domain.com.
 ```
 ***MX Records:***
 ```
-domain.com	IN	MX	1   mail.example.com. 
-@		IN	MX	1   mail.example.com. 
-@		IN	MX	2   mail.example.com.
+mydomain.com.       IN      MX      10 domain.com.
+@		IN	MX	5   mx.domain.com. 
+@		IN	MX	10  mx.domain.com.
 ```
 
 ***SPF Records:***
 ```
-@       	IN      TXT	v=spf1 ip4:83.136.253.111 include:_spf.google.com include: ~all
+@       	IN      TXT	v=spf1 ip4:83.136.253.111 include:_spf.google.com include: -all
 ```
+![Spf Generators](https://mxtoolbox.com/SPFRecordGenerator.aspx)
 
 ***DKIM Record:***
 ```
 @       	IN      TXT	v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB
 ```
+![DKIM Generators](https://dmarcly.com/tools/dkim-record-generator)
 
 ***DMARC Record:***
 ```
-@		IN	TXT	"v=DMARC1; p=quarantine; rua=mailto:734eda41@mxtoolbox.dmarc-report.com; ruf=mailto:734eda41@forensics.dmarc-report.com; fo=1"
+@		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
+![DMARC Generators](https://mxtoolbox.com/DMARCRecordGenerator.aspx)
+
 # 4.2 OpenDkim Configurations:
 ```bash
 sudo chown -R opendkim:opendkim /etc/opendkim
@@ -109,10 +127,10 @@ sudo nano /etc/opendkim/TrustedHosts
 localhost
 192.168.0.1/24
 
-*.example.com
+*.domain.com
 
-#*.example.net
-#*.example.org
+#*.domain.net
+#*.domain.org
 ```
 # 4.7 Create Table
 
@@ -187,3 +205,6 @@ Authentication-Results: mx.google.com;
        dkim=pass header.i=@example.com;
 ```
 
+![Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
+
+![How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
