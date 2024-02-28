@@ -70,6 +70,7 @@ dig domain.com
 
 # 4.2 OpenDkim Configurations:
 ```bash
+sudo apt install opendkim 
 sudo chown -R opendkim:opendkim /etc/opendkim
 sudo nano /etc/opendkim.conf
 ```
@@ -88,6 +89,7 @@ Socket inet:12301@localhost
 PidFile /var/run/opendkim/opendkim.pid
 ExternalIgnoreList refile:/etc/opendkim/TrustedHosts
 InternalHosts refile:/etc/opendkim/TrustedHosts
+KeyFile /etc/opendkim/keys
 KeyTable refile:/etc/opendkim/KeyTable
 SigningTable refile:/etc/opendkim/SigningTable
 SignatureAlgorithm rsa-sha256 
