@@ -22,9 +22,8 @@ $TTL    604800
 ;
 
 domain.com	IN	A	83.136.253.111
-domain.com	IN	MX	1   mail.domain.com. 
-@		IN	MX	1   mail.domain.com. 
-@		IN	MX	2   mail.domain.com.
+mydomain.com       IN      MX      10 domain.com.
+@		IN	MX	10  mx.domain.com.
 @       	IN      TXT	v=spf1 ip4:83.136.253.111 include:_spf.google.com include: -all
 @       	IN      TXT	v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB
 @		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
@@ -34,15 +33,17 @@ domain.com	IN	MX	1   mail.domain.com.
 ```
 domain.com	IN	A	83.136.253.111
 ```
+
 ***PTR Record:***
 ```
 83.136.253.in-addr.arpa. IN  SOA  domain.com.
 ```
+
 ***MX Records:***
 ```
-mydomain.com.       IN      MX      10 domain.com.
-@		IN	MX	5   mx.domain.com. 
-@		IN	MX	10  mx.domain.com.
+domain.com       IN      MX      10 domain.com.
+@		IN	MX	10  domain.com.
+domain.com    IN    A       1.2.3.4
 ```
 
 ***SPF Records:***
@@ -62,6 +63,10 @@ mydomain.com.       IN      MX      10 domain.com.
 @		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
 ![DMARC Generators](https://mxtoolbox.com/DMARCRecordGenerator.aspx)
+
+***Troubleshooting:***
+
+dig domain.com
 
 # 4.2 OpenDkim Configurations:
 ```bash
@@ -205,6 +210,6 @@ Authentication-Results: mx.google.com;
        dkim=pass header.i=@example.com;
 ```
 
+![Bind 9 on Ubuntu](https://help.ubuntu.com/community/BIND9ServerHowto)
 ![Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
-
 ![How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
