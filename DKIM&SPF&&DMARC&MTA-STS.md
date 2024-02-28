@@ -145,12 +145,16 @@ localhost
 sudo nano /etc/opendkim/KeyTable
 ```
 _Customize and add the following lines to the newly created file. Multiple domains can be specified, do not edit the first three lines:_
-```
-mail._domainkey.example.com example.com:mail:/etc/opendkim/keys/example.com/mail.private
 
-#mail._domainkey.example.net example.net:mail:/etc/opendkim/keys/example.net/mail.private
-#mail._domainkey.example.org example.org:mail:/etc/opendkim/keys/example.org/mail.private
+* Add the following line:
+
 ```
+youselector._domainkey.yourdomain.com yourdomain.com:selector:/etc/opendkim/keys/yourdomain.com/default.private
+```
+This line specifies the location of the DKIM private key. In this screenshot, the selector is the “default”.
+
+In this screenshot, selector is defined as default
+![In this screenshot, selector is defined as default](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/5.png.webp)
 
 # 4.8 Create a signing table:
 
@@ -177,7 +181,7 @@ cd example.com
 ```
 _Generate the keys_
 ```bash
-sudo opendkim-genkey -s mail -d example.com
+sudo opendkim-genkey -b 1024 -d domain.com -D /etc/opendkim/keys/domain.com -s yourselector -v
 ```
 
 > -s specifies the selector and -d the domain, this command will create two files, mail.private is our private key and mail.txt contains the public key.
@@ -187,12 +191,26 @@ _Change the owner of the private key to opendkim:_
 ```bash
 sudo chown opendkim:opendkim mail.private
 ```
-# 4.10 Add the public key to the domain’s DNS records
+# 4.10 Add the public key to the domain’s DNS records and Publish the created public key in your DNS
+
+sudo cat /etc/opendkim/keys/domain.com/default.txt
+
 _Open mail.txt:_
 ```
 mail._domainkey IN TXT "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N3lnvvrYgPCRSoqn+awTpE+iGYcKBPpo8HHbcFfCIIV10Hwo4PhCoGZSaKVHOjDm4yefKXhQjM7iKzEPuBatE7O47hAx1CJpNuIdLxhILSbEmbMxJrJAG0HZVn8z6EAoOHZNaPHmK2h4UUrjOG8zA5BHfzJf7tGwI+K619fFUwIDAQAB" ; ----- DKIM key mail for example.com
 ```
+![DKIM](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/8.png.webp)
+
 * Copy that key and add a TXT record to your domain’s DNS entries:
+
+* Implement it in your DNS (In this example, Cloudflare).
+
+> Important Notes:
+> Name/Target: yourselector._domainkey
+> Content: Value you’ve copied in the previous stage. Make sure to remove any spaces or
+> double-quotes.
+
+![Cloudflare sample](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/9.png.webp)
 
 ```
 Name: mail._domainkey.example.com.
@@ -215,3 +233,4 @@ Authentication-Results: mx.google.com;
 ![Bind 9 on Ubuntu](https://help.ubuntu.com/community/BIND9ServerHowto)
 ![Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
 ![How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
+![OpenDKIM Configuration](https://easydmarc.com/blog/how-to-configure-dkim-opendkim-with-postfix/)
