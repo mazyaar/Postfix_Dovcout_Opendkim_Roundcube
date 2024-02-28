@@ -309,7 +309,7 @@ vi /etc/aliases
 Edit like this:
 ```bash
 postmaster: root
-root: mail@cyberred.org
+root: yourmail@domain.local
 ```
 
 ```bash
