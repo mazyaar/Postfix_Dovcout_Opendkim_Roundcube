@@ -113,6 +113,13 @@ sudo nano /etc/postfix/main.cf
 ```
 ```bash
 milter_protocol = 2
+smtpd_milters = inet:127.0.0.1:8891
+non_smtpd_milters = $smtpd_milters
+milter_default_action = accept
+```
+or
+
+```bash
 milter_default_action = accept
 smtpd_milters = inet:localhost:12301
 non_smtpd_milters = inet:localhost:12301
