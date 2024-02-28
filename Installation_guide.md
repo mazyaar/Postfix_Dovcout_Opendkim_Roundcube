@@ -99,6 +99,10 @@ chmod 775 /home/info/
 ```bash
 chmod 755 /home/mail/
 ```
+```bash
+usermod info -s /sbin/nologin
+usermod mail -s /sbin/nologin
+```
 
 ## 2. Install Postfix
 
