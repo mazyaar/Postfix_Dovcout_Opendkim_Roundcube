@@ -89,7 +89,7 @@ Socket inet:12301@localhost
 PidFile /var/run/opendkim/opendkim.pid
 ExternalIgnoreList refile:/etc/opendkim/TrustedHosts
 InternalHosts refile:/etc/opendkim/TrustedHosts
-KeyFile /etc/opendkim/keys
+KeyFile /etc/opendkim/keys/domain/domain.private
 KeyTable refile:/etc/opendkim/KeyTable
 SigningTable refile:/etc/opendkim/SigningTable
 SignatureAlgorithm rsa-sha256 
