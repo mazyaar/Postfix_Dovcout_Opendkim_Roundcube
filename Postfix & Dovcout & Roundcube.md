@@ -4,6 +4,7 @@
 >_Introduction
 Postfix is a mail transfer agent (MTA), an application used to send and receive email. It can be configured so that it can be used to send emails by local application only. This is useful in situations when you need to regularly send email notifications from your apps or have a lot of outbound traffic that a third-party email service provider won’t allow. It’s also a lighter alternative to running a full-blown SMTP server, while retaining the required functionality._
 
+
 ***In this tutorial, you’ll install and configure Postfix as a send-only SMTP server. You’ll also request free TLS certificates from Let’s Encrypt for your domain and encrypt the outbound emails using them.***
 
 ***
@@ -70,13 +71,13 @@ adduser mail
 adduser info
 ```
 ```bash
-usermod -aG sudo info
+usermod -aG sudo mail
 ```
 ```bash
 usermod -aG sudo mail
 ```
 ```bash
-groupadd -g 5000 info
+groupadd -g 5000 mail
 ```
 ```bash
 groupadd -g 5000 mail
