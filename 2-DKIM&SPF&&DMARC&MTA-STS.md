@@ -68,6 +68,8 @@ domain.com    IN    A       1.2.3.4
 
 dig domain.com
 
+***MTA-STS***
+
 # 4.2 OpenDkim Configurations:
 ```bash
 sudo apt install opendkim 
@@ -240,7 +242,10 @@ Authentication-Results: mx.google.com;
        dkim=pass header.i=@example.com;
 ```
 
+
 ![Bind 9 on Ubuntu](https://help.ubuntu.com/community/BIND9ServerHowto)
 ![Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
 ![How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
 ![OpenDKIM Configuration](https://easydmarc.com/blog/how-to-configure-dkim-opendkim-with-postfix/)
+![Google Admin Tools](https://toolbox.googleapps.com/apps/main/)
+![How to Set Up MTA-STS and TLS Reporting to Identify and Fix Email Security Issues](https://dmarcly.com/blog/how-to-set-up-mta-sts-and-tls-reporting)
