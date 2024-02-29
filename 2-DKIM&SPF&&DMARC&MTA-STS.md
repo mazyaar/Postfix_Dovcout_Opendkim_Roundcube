@@ -269,3 +269,5 @@ Authentication-Results: mx.google.com;
 ![Google Admin Tools](https://toolbox.googleapps.com/apps/main/)
 .
 ![How to Set Up MTA-STS and TLS Reporting to Identify and Fix Email Security Issues](https://dmarcly.com/blog/how-to-set-up-mta-sts-and-tls-reporting)
+
+> ![All in one](https://dmarcly.com/tools/spf-dkim-dmarc-wizard/#intro)
