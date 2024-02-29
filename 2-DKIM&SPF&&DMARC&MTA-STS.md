@@ -69,6 +69,21 @@ domain.com    IN    A       1.2.3.4
 dig domain.com
 
 ***MTA-STS***
+![Use this link to MTA-STS Generator](https://www.skysnag.com/mta-sts-generator/)
+![or this link](https://easydmarc.com/tools/mta-sts-generator)
+
+Result:
+```
+v=STSv1; id=20240229082100
+```
+Policy content:
+```
+version: STSv1
+mode: none
+mx: mx.domain.com
+max_age: 604800
+```
+Create mta-sts.domain.com subdomain and upload generated mta-sts.txt policy file to ".well-known" folder so that it can be accessible through https://mta-sts.domain.com/.well-known/mta-sts.txt link
 
 # 4.2 OpenDkim Configurations:
 ```bash
