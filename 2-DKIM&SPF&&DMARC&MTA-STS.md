@@ -26,7 +26,7 @@ mydomain.com       IN      MX      10 domain.com.
 @		IN	MX	10  mx.domain.com.
 @       	IN      TXT	"v=spf1 a:cyberred.org ip4:1.2.3.4/24 ip6:2aba:5e80::ed74:651f:858a:1/112 include:google.com include:yahoo.com include:msn.com -all"
 @       	IN      TXT	"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB"
-@		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
+_dmarc		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
 
 ***DNS Record (A):*** 
@@ -60,7 +60,7 @@ domain.com    IN    A       1.2.3.4
 
 ***DMARC Record:***
 ```
-@		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
+_dmarc		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
 ![DMARC Generators](https://mxtoolbox.com/DMARCRecordGenerator.aspx)
 
