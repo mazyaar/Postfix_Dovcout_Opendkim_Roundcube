@@ -23,7 +23,7 @@ $TTL    604800
 
 domain.com	IN	A	83.136.253.111
 mydomain.com       IN      MX      10 domain.com.
-@		IN	MX	10  mx.domain.com.
+@		IN	MX	10  mail.domain.com.
 @       	IN      TXT	"v=spf1 mx a:domain.com ip4:192.4.66.7 ip6:2a0b:5a60::eb74:651f:858a:1/112 include:_spf.google.com ~all"
 @       	IN      TXT	"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB"
 _dmarc		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
@@ -42,7 +42,7 @@ domain.com	IN	A	83.136.253.111
 ***MX Records:***
 ```
 domain.com       IN      MX      10 domain.com.
-@		IN	MX	10  domain.com.
+@		IN	MX	10  mail.domain.com.
 domain.com    IN    A       1.2.3.4
 ```
 
