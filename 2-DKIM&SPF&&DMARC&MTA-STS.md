@@ -50,27 +50,27 @@ domain.com    IN    A       1.2.3.4
 ```
 @       	IN      TXT	"v=spf1 mx a:domain.com ip4:192.4.66.7 ip6:2a0b:5a60::eb74:651f:858a:1/112 include:_spf.google.com ~all"
 ```
-![Spf Generators](https://mxtoolbox.com/SPFRecordGenerator.aspx)
+[Spf Generators](https://mxtoolbox.com/SPFRecordGenerator.aspx)
 
 ***DKIM Record:***
 ```
 @       	IN      TXT	"v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArw+jkhwYC0SpuVtXtuVKysWXjq6uCu/c1sqTE6DoFE8V4adol90VxiT93HpbKG4Ih2wevDXXhWZsN//u0qhkLb3iBlEtkRzryX1Dz2MeX3W72fm/tbi5Q6SASxxetAojrQQjJtpqDZnLCnqFsWLBj+0hl6SVyo96g7h6PReAd7o27zRE1EC3W4dSOArKtQzbufCKkvURuVtnWH1kntjLRFN3yqfvW5wAzMRCC8Cdk4KERhpzxFtjL7r2sdyrjVTTJTpzX2Hea74H/bVSWefHjubjkZBy634RSAWmpao4rQt2eaUkB6bKpg5VJlFZEebPQr2GZkzViuDi5gyf+0byhQIDAQAB"
 ```
-![DKIM Generators](https://dmarcly.com/tools/dkim-record-generator)
+[DKIM Generators](https://dmarcly.com/tools/dkim-record-generator)
 
 ***DMARC Record:***
 ```
 _dmarc		IN	TXT	"v=DMARC1; p=reject; rua=mailto:info@domain.com; ruf=mailto:info@domain.com; sp=reject; aspf=s; adkim=s; fo=0:1:d:s;"
 ```
-![DMARC Generators](https://mxtoolbox.com/DMARCRecordGenerator.aspx)
+[DMARC Generators](https://mxtoolbox.com/DMARCRecordGenerator.aspx)
 
 ***Troubleshooting:***
 
 dig domain.com
 
 ***MTA-STS***
-![Use this link to MTA-STS Generator](https://www.skysnag.com/mta-sts-generator/)
-![or this link](https://easydmarc.com/tools/mta-sts-generator)
+[Use this link to MTA-STS Generator](https://www.skysnag.com/mta-sts-generator/)
+[MTA-STS](https://easydmarc.com/tools/mta-sts-generator/)
 
 Result:
 ```
@@ -181,7 +181,7 @@ youselector._domainkey.yourdomain.com yourdomain.com:selector:/etc/opendkim/keys
 This line specifies the location of the DKIM private key. In this screenshot, the selector is the “default”.
 
 In this screenshot, selector is defined as default
-![In this screenshot, selector is defined as default](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/5.png.webp)
+[In this screenshot, selector is defined as default](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/5.png.webp)
 
 # 4.8 Create a signing table:
 
@@ -226,7 +226,7 @@ _Open mail.txt:_
 ```
 mail._domainkey IN TXT "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC5N3lnvvrYgPCRSoqn+awTpE+iGYcKBPpo8HHbcFfCIIV10Hwo4PhCoGZSaKVHOjDm4yefKXhQjM7iKzEPuBatE7O47hAx1CJpNuIdLxhILSbEmbMxJrJAG0HZVn8z6EAoOHZNaPHmK2h4UUrjOG8zA5BHfzJf7tGwI+K619fFUwIDAQAB" ; ----- DKIM key mail for example.com
 ```
-![DKIM](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/8.png.webp)
+[DKIM](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/8.png.webp)
 
 * Copy that key and add a TXT record to your domain’s DNS entries:
 
@@ -237,7 +237,7 @@ mail._domainkey IN TXT "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ
 > Content: Value you’ve copied in the previous stage. Make sure to remove any spaces or
 > double-quotes.
 
-![Cloudflare sample](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/9.png.webp)
+[Cloudflare sample](https://easydmarc.com/blog/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2021/10/9.png.webp)
 
 ```
 Name: mail._domainkey.example.com.
@@ -260,24 +260,24 @@ Authentication-Results: mx.google.com;
 
 >
 [Bind 9 on Ubuntu](https://help.ubuntu.com/community/BIND9ServerHowto/)
-.
+
 >
-![Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
-.
+[Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580?hl=en)
+
 >
-![How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
-.
+[How to Implement DMARC/DKIM/SPF to Stop Email Spoofing/Phishing: The Definitive Guide](https://dmarcly.com/blog/how-to-implement-dmarc-dkim-spf-to-stop-email-spoofing-phishing-the-definitive-guide)
+
 >
-![OpenDKIM Configuration](https://easydmarc.com/blog/how-to-configure-dkim-opendkim-with-postfix/)
-.
+[OpenDKIM Configuration](https://easydmarc.com/blog/how-to-configure-dkim-opendkim-with-postfix/)
+
 >
-![Google Admin Tools](https://toolbox.googleapps.com/apps/main/)
-.
+[Google Admin Tools](https://toolbox.googleapps.com/apps/main/)
+
 >
-![How to Set Up MTA-STS and TLS Reporting to Identify and Fix Email Security Issues](https://dmarcly.com/blog/how-to-set-up-mta-sts-and-tls-reporting)
-.
+[How to Set Up MTA-STS and TLS Reporting to Identify and Fix Email Security Issues](https://dmarcly.com/blog/how-to-set-up-mta-sts-and-tls-reporting)
+
 >
- ![All in one](https://dmarcly.com/tools/spf-dkim-dmarc-wizard/#intro)
-.
+ [All in one](https://dmarcly.com/tools/spf-dkim-dmarc-wizard/#intro)
+
 >
-![Domain Health Check](https://mxtoolbox.com/emailhealth/)
+[Domain Health Check](https://mxtoolbox.com/emailhealth/)
