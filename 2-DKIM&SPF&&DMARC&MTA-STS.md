@@ -3,7 +3,7 @@
 
 # 4. DNS Record Introduce:
 
-![Before visit Bind9 DNS server configurations]([https://tecadmin.net/wp-content/uploads/2021/07/roundcube-step-1.png](https://github.com/mazyaar/Ubuntu_DNS_Server_Bind9))
+[Before visit Bind9 DNS server configurations]([https://tecadmin.net/wp-content/uploads/2021/07/roundcube-step-1.png](https://github.com/mazyaar/Ubuntu_DNS_Server_Bind9))
 
 
 ## 4.1 Explain necessary mails records:
